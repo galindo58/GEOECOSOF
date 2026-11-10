@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geoecosof - Iniciar Sesión</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Boxicons (Icons) -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: transparent;
+        }
+        .login-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 3rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        .login-logo {
+            height: 80px;
+            margin-bottom: 1.5rem;
+        }
+        .login-title {
+            margin-bottom: 2rem;
+            color: var(--color-primary);
+        }
+        .login-card form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            text-align: left;
+        }
+        .flash-messages {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 1.5rem;
+        }
+        .flash-messages li {
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            background-color: #ffebee;
+            color: var(--color-error);
+            border: 1px solid #ffcdd2;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <video autoplay muted loop id="bg-video" style="position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%; z-index: -1; object-fit: cover;">
+        <source src="{{ url_for('static', filename='videos/fondo.mp4') }}" type="video/mp4">
+    </video>
+    
+    <!-- Logo over the watermark -->
+    <img src="{{ url_for('static', filename='img/logo.png') }}" style="position: fixed; bottom: 40px; right: 40px; width: 80px; height: auto; z-index: 0; opacity: 0.9; pointer-events: none;" alt="Geoecosof">
+
+    <div class="login-card">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Geoecosof Logo" class="login-logo">
+        <h2 class="login-title">Iniciar Sesión</h2>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="flash-messages">
+            {% for category, message in messages %}
+              <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <style>
+            .input-group {
+                position: relative;
+                display: flex;
+                align-items: center;
+                margin-bottom: 0.5rem;
+            }
+            .input-group i {
+                position: absolute;
+                left: 1rem;
+                color: var(--color-text-muted);
+                font-size: 1.2rem;
+            }
+            .input-group input {
+                width: 100%;
+                padding: 0.85rem 1rem 0.85rem 2.8rem;
+                border: 1px solid #ddd;
+                border-radius: var(--radius-md);
+                font-family: inherit;
+                font-size: 1rem;
+                transition: var(--transition-normal);
+                background-color: #f9f9f9;
+            }
+            .input-group input:focus {
+                border-color: var(--color-primary);
+                background-color: var(--color-white);
+                box-shadow: 0 0 0 4px rgba(26, 77, 46, 0.1);
+                outline: none;
+            }
+            .toggle-password {
+                position: absolute;
+                right: 1rem;
+                left: auto !important;
+                cursor: pointer;
+                color: var(--color-text-muted);
+                transition: color 0.2s;
+            }
+            .toggle-password:hover {
+                color: var(--color-primary);
+            }
+            .forgot-password {
+                display: block;
+                text-align: right;
+                font-size: 0.85rem;
+                color: var(--color-primary);
+                text-decoration: none;
+                margin-top: -0.5rem;
+                margin-bottom: 1.5rem;
+                font-weight: 500;
+                transition: opacity 0.2s;
+            }
+            .forgot-password:hover {
+                opacity: 0.8;
+                text-decoration: underline;
+            }
+            .btn-modern {
+                background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+                color: white;
+                border: none;
+                padding: 1rem;
+                border-radius: var(--radius-md);
+                font-weight: 600;
+                font-size: 1.1rem;
+                cursor: pointer;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 0.5rem;
+                width: 100%;
+            }
+            .btn-modern:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 15px rgba(26, 77, 46, 0.3);
+            }
+            .btn-modern:active {
+                transform: translateY(0);
+                box-shadow: 0 4px 10px rgba(26, 77, 46, 0.2);
+            }
+        </style>
+        
+        <form action="{{ url_for('login') }}" method="POST" autocomplete="off">
+            <div class="form-group">
+                <label for="username" style="display: none;">Usuario</label>
+                <div class="input-group">
+                    <i class='bx bx-user'></i>
+                    <input type="text" id="username" name="username" required placeholder="Usuario" autocomplete="off">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password" style="display: none;">Contraseña</label>
+                <div class="input-group">
+                    <i class='bx bx-lock-alt'></i>
+                    <input type="password" id="password" name="password" required placeholder="Contraseña" autocomplete="new-password">
+                    <i class='bx bx-show toggle-password' id="togglePassword"></i>
+                </div>
+            </div>
+            
+            <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+            
+            <button type="submit" class="btn-modern">Entrar <i class='bx bx-log-in-circle'></i></button>
+        </form>
+        
+        <div style="margin-top: 1.5rem;">
+            <p>¿No tienes cuenta? <a href="{{ url_for('register') }}" style="color: var(--color-primary); font-weight: 600;">Regístrate aquí</a></p>
+        </div>
+    </div>
+
+    <script>
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+
+        togglePassword.addEventListener('click', function (e) {
+            // Toggle the type attribute
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            // Toggle the eye icon
+            this.classList.toggle('bx-show');
+            this.classList.toggle('bx-hide');
+        });
+    </script>
+
+</body>
+</html>

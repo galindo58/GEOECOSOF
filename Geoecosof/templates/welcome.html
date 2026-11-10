@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geoecosof | Bienvenido</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter, sans-serif;min-height:100vh;color:#173b2a;background:#071b12}
+    .hero{min-height:100vh;position:relative;display:flex;align-items:center;overflow:hidden;background:linear-gradient(90deg,rgba(4,25,15,.94),rgba(5,35,19,.75),rgba(5,35,19,.25)),url("{{ url_for('static', filename='img/fondo_ambiente.avif') }}") center/cover}
+    .hero:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(119,202,95,.22),transparent 35%);pointer-events:none}
+    .wrap{width:min(1160px,92%);margin:auto;position:relative;z-index:1;padding:55px 0;color:white}
+    .top{display:flex;align-items:center;gap:13px;margin-bottom:75px}.top img{width:58px;height:58px;object-fit:contain}.brand{font-size:1.35rem;font-weight:900;letter-spacing:1px}.brand small{display:block;font-size:.65rem;letter-spacing:3px;color:#a9d6a9;font-weight:600;margin-top:3px}
+    .tag{display:inline-flex;gap:9px;align-items:center;padding:10px 16px;border:1px solid #8cc78c66;border-radius:30px;color:#c7edc5;background:#ffffff0d;font-size:.78rem;font-weight:700;letter-spacing:.5px}
+    h1{font-size:clamp(2.7rem,6vw,5.4rem);line-height:1.02;max-width:780px;margin:25px 0 20px;font-weight:900;letter-spacing:-3px}h1 span{color:#9be27c}.lead{max-width:630px;line-height:1.8;color:#d1e0d4;font-size:1.04rem}
+    .actions{display:flex;gap:14px;flex-wrap:wrap;margin:34px 0 55px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:15px 24px;border-radius:12px;text-decoration:none;font-weight:800;transition:.25s}.primary{background:#8bd66c;color:#102b19;box-shadow:0 12px 30px #5ea54a44}.secondary{border:1px solid #ffffff70;color:white;background:#ffffff12}.btn:hover{transform:translateY(-3px)}
+    .features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;max-width:900px}.feature{padding:20px;border:1px solid #ffffff26;background:#ffffff10;backdrop-filter:blur(12px);border-radius:16px}.feature i{font-size:1.6rem;color:#a4e486}.feature h3{font-size:.95rem;margin:10px 0 6px}.feature p{font-size:.78rem;line-height:1.6;color:#c9d9cc}.foot{margin-top:35px;color:#a8c0ad;font-size:.75rem}
+    @media(max-width:650px){.top{margin-bottom:55px}h1{letter-spacing:-1.5px}.features{grid-template-columns:1fr}.wrap{padding:35px 0}.foot{margin-bottom:15px}}
+  </style>
+</head>
+<body><main class="hero"><div class="wrap">
+  <div class="top"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="Geoecosof"><div class="brand">GEOECOSOF<small>TECNOLOGÍA PARA EL PLANETA</small></div></div>
+  <span class="tag"><i class='bx bx-leaf'></i> COMPROMETIDOS CON EL ODS 15</span>
+  <h1>Un entorno mejor<br>comienza con <span>una acción.</span></h1>
+  <p class="lead">Geoecosof conecta a las personas con el cuidado ambiental. Identifica situaciones que afectan nuestros ecosistemas, realiza reportes y acompaña el proceso para construir comunidades más limpias y sostenibles.</p>
+  <div class="actions"><a class="btn primary" href="{{ url_for('login') }}"><i class='bx bx-log-in-circle'></i> Iniciar sesión</a><a class="btn secondary" href="{{ url_for('register') }}"><i class='bx bx-user-plus'></i> Crear cuenta</a></div>
+  <section class="features"><article class="feature"><i class='bx bx-map-alt'></i><h3>Ubica los problemas</h3><p>Consulta el mapa y reconoce los puntos que necesitan atención ambiental.</p></article><article class="feature"><i class='bx bx-message-square-add'></i><h3>Haz tu reporte</h3><p>Comparte lo que sucede en tu comunidad para que pueda ser atendido.</p></article><article class="feature"><i class='bx bx-line-chart'></i><h3>Haz seguimiento</h3><p>Conoce el estado de los reportes y los avances de cada caso.</p></article></section>
+  <p class="foot">© 2026 Geoecosof · Cuidar la naturaleza también está en tus manos.</p>
+</div></main></body></html>

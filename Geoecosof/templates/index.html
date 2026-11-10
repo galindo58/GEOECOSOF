@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geoecosof - Protección de Ecosistemas Terrestres</title>
+    
+    <!-- Boxicons (Icons) -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}?v=4">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-dashboard.css') }}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo" data-target="home">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Geoecosof Logo" class="navbar-logo">
+                <span>Geoecosof</span>
+            </div>
+            
+            <button class="menu-toggle" id="menu-toggle">
+                <i class='bx bx-menu'></i>
+            </button>
+
+            <ul class="nav-links" id="nav-links">
+                <li><a href="#" data-target="home" class="nav-item active">Inicio</a></li>
+                {% if session.username == 'admin' %}
+                <li><a href="#" data-target="admin" class="nav-item">Admin</a></li>
+                {% else %}
+                <li><a href="#" data-target="map-view" class="nav-item">Mapa ambiental</a></li>
+                <li><a href="#" data-target="track" class="nav-item">Consultar reporte</a></li>
+                <li><button class="btn-primary nav-btn" data-target="report">Reportar ahora</button></li>
+                {% endif %}
+                <li><a href="{{ url_for('logout') }}" class="btn-secondary" style="padding: 0.5rem 1rem;"><i class='bx bx-log-out'></i> Salir</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="app-content">
+        
+        <!-- ================= HOME SECTION ================= -->
+        <section id="home" class="page-section active">
+            
+            <!-- Hero -->
+            <header class="hero">
+                <div class="hero-content">
+                    <span class="hero-badge">ODS 15: Vida de ecosistemas terrestres</span>
+                    <h1 class="hero-title">Reporta un problema ambiental de tu comunidad</h1>
+                    <p class="hero-subtitle">¿Viste contaminación, acumulación de residuos, tala de árboles u otro problema ambiental? Repórtalo y permite que la comunidad haga seguimiento.</p>
+                </div>
+                <div class="hero-image-container">
+                    <video class="hero-image" src="{{ url_for('static', filename='video_limpio_mejorado.mp4') }}" autoplay loop muted playsinline style="object-fit: cover;"></video>
+                </div>
+            </header>
+
+            <div class="prevention-banner" id="prevention">
+                <p><strong>El cuidado del medio ambiente comienza cuando identificamos y actuamos frente a los problemas que afectan nuestro entorno.</strong></p>
+            </div>
+
+            <!-- Stats Preview -->
+            <section class="home-section stats-section">
+                <div class="section-header">
+                    <h2>Estado ambiental de nuestra comunidad</h2>
+                    <p>Monitoreo en tiempo real de los reportes ciudadanos.</p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class='bx bx-list-ul'></i></div>
+                        <h3 id="stat-total">0</h3>
+                        <p>Total de reportes</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon warning"><i class='bx bx-time-five'></i></div>
+                        <h3 id="stat-active">0</h3>
+                        <p>En seguimiento</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success"><i class='bx bx-check-circle'></i></div>
+                        <h3 id="stat-solved">0</h3>
+                        <p>Solucionados</p>
+                    </div>
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart-box">
+                        <h3>Reportes por tipo</h3>
+                        <canvas id="typeChart"></canvas>
+                    </div>
+                    <div class="chart-box">
+                        <h3>Estado de reportes</h3>
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Impact Cards -->
+            <section class="home-section impact-section bg-light">
+                <div class="section-header">
+                    <h2>¿Cómo afecta la contaminación a nuestro planeta?</h2>
+                </div>
+                
+                <div class="impact-grid">
+                    <div class="impact-card">
+                        <div class="impact-emoji">🌱</div>
+                        <h3>Contaminación del suelo</h3>
+                        <p>La acumulación de residuos y sustancias químicas puede deteriorar la calidad del suelo y afectar ecosistemas enteros.</p>
+                    </div>
+                    <div class="impact-card">
+                        <div class="impact-emoji">🌳</div>
+                        <h3>Deforestación</h3>
+                        <p>La pérdida de cobertura vegetal reduce la biodiversidad, altera el clima y contribuye a la degradación del suelo.</p>
+                    </div>
+                    <div class="impact-card">
+                        <div class="impact-emoji">💧</div>
+                        <h3>Contaminación del agua</h3>
+                        <p>Los residuos y contaminantes pueden afectar ríos, quebradas y fuentes de agua vitales para la comunidad.</p>
+                    </div>
+                    <div class="impact-card">
+                        <div class="impact-emoji">🗑️</div>
+                        <h3>Botaderos clandestinos</h3>
+                        <p>La disposición inadecuada de residuos genera malos olores, plagas y un severo deterioro del paisaje.</p>
+                    </div>
+                    <div class="impact-card">
+                        <div class="impact-emoji">🐝</div>
+                        <h3>Pérdida de biodiversidad</h3>
+                        <p>La destrucción y transformación de hábitats puede afectar gravemente a diferentes especies de flora y fauna.</p>
+                    </div>
+                    <div class="impact-card">
+                        <div class="impact-emoji">♻️</div>
+                        <h3>Acumulación de residuos</h3>
+                        <p>La basura abandonada afecta los ecosistemas terrestres y reduce significativamente la calidad de vida.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ODS 15 -->
+            <section class="home-section ods-section" id="ods15">
+                <div class="ods-content">
+                    <h2>Geoecosof y el ODS 15</h2>
+                    <p>Esta plataforma está directamente relacionada con el <strong>Objetivo de Desarrollo Sostenible 15</strong>. Nuestros principales enfoques son:</p>
+                    <ul class="ods-list">
+                        <li><i class='bx bx-check'></i> Proteger los ecosistemas terrestres</li>
+                        <li><i class='bx bx-check'></i> Combatir la degradación de los suelos</li>
+                        <li><i class='bx bx-check'></i> Detener la pérdida de biodiversidad</li>
+                        <li><i class='bx bx-check'></i> Proteger los bosques</li>
+                        <li><i class='bx bx-check'></i> Promover la restauración de ecosistemas</li>
+                        <li><i class='bx bx-check'></i> Combatir la deforestación</li>
+                    </ul>
+                </div>
+                <div class="ods-card">
+                    <div class="ods-number">ODS 15</div>
+                    <div class="ods-title">Vida de ecosistemas terrestres</div>
+                </div>
+            </section>
+
+            <!-- Education & Prevention -->
+            <section class="home-section edu-section bg-light">
+                <div class="section-header">
+                    <h2>Aprende y actúa</h2>
+                    <p>Pequeñas acciones generan grandes cambios.</p>
+                </div>
+                
+                <div class="edu-tips-grid">
+                    <div class="tip-card">
+                        <div class="tip-icon-wrapper">
+                            <i class='bx bx-trash'></i>
+                        </div>
+                        <div class="tip-content">
+                            <h3>Evita arrojar basura</h3>
+                            <p>en espacios naturales.</p>
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon-wrapper">
+                            <i class='bx bx-landscape'></i>
+                        </div>
+                        <div class="tip-content">
+                            <h3>Protege y conserva</h3>
+                            <p>los árboles y bosques.</p>
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon-wrapper">
+                            <i class='bx bx-recycle'></i>
+                        </div>
+                        <div class="tip-content">
+                            <h3>Separa correctamente</h3>
+                            <p>los residuos desde casa.</p>
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon-wrapper">
+                            <i class='bx bx-water'></i>
+                        </div>
+                        <div class="tip-content">
+                            <h3>Evita contaminar</h3>
+                            <p>ríos y fuentes de agua.</p>
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon-wrapper">
+                            <i class='bx bx-leaf'></i>
+                        </div>
+                        <div class="tip-content">
+                            <h3>Respeta los ecosistemas</h3>
+                            <p>y toda la fauna local.</p>
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon-wrapper">
+                            <i class='bx bx-camera'></i>
+                        </div>
+                        <div class="tip-content">
+                            <h3>Reporta los problemas</h3>
+                            <p>ambientales de tu comunidad.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- ================= REPORT SECTION ================= -->
+        <section id="report" class="page-section hidden">
+            <div class="container-narrow mt-nav">
+                <div class="form-header">
+                    <h2>Reportar un incidente ambiental</h2>
+                    <p>Ayúdanos a proteger el medio ambiente enviando los detalles del problema.</p>
+                </div>
+
+                <div id="report-success" class="alert alert-success hidden">
+                    <h3><i class='bx bx-check-circle'></i> Reporte enviado correctamente</h3>
+                    <p>Tu reporte ha sido registrado con el código:</p>
+                    <div class="code-display" id="generated-code">GEO-000000</div>
+                    <p class="small">Guarda este código para consultar el estado de tu reporte.</p>
+                    <button type="button" class="btn-secondary" id="btn-new-report">Enviar otro reporte</button>
+                    <button type="button" class="btn-primary" id="btn-track-new-report">Consultar mi reporte</button>
+                </div>
+
+                <form id="report-form" class="card-form">
+                    <div class="form-group">
+                        <label for="inc-type">Tipo de incidente *</label>
+                        <select id="inc-type" required>
+                            <option value="" disabled selected>Seleccione una opción</option>
+                            <option value="Deforestación">Deforestación</option>
+                            <option value="Tala de árboles">Tala de árboles</option>
+                            <option value="Botadero clandestino">Botadero clandestino</option>
+                            <option value="Acumulación de basura">Acumulación de basura</option>
+                            <option value="Contaminación del suelo">Contaminación del suelo</option>
+                            <option value="Contaminación del agua">Contaminación del agua</option>
+                            <option value="Quema de residuos">Quema de residuos</option>
+                            <option value="Daño a ecosistemas">Daño a ecosistemas</option>
+                            <option value="Pérdida de biodiversidad">Pérdida de biodiversidad</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inc-desc">Descripción *</label>
+                        <textarea id="inc-desc" rows="4" placeholder="Describe qué está sucediendo, dónde ocurre y cómo está afectando el entorno..." required></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="inc-date">Fecha del incidente *</label>
+                            <input type="date" id="inc-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="inc-time">Hora aproximada</label>
+                            <input type="time" id="inc-time">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Evidencia fotográfica</label>
+                        <div class="file-upload" id="file-upload-container">
+                            <i class='bx bx-cloud-upload'></i>
+                            <p>Haz clic para subir un archivo</p>
+                            <input type="file" id="inc-photo" accept="image/*" capture="environment">
+                        </div>
+                        <div class="mt-1 text-center">
+                            <button type="button" class="btn-secondary btn-small w-100" id="btn-start-camera" style="border: 1px dashed var(--color-primary); background: transparent; color: var(--color-primary);">
+                                <i class='bx bx-camera'></i> Tomar foto con la cámara aquí
+                            </button>
+                        </div>
+                        
+                        <!-- Contenedor de la cámara web -->
+                        <div id="camera-container" class="hidden mt-1 text-center" style="background: #000; border-radius: var(--radius-md); padding: 1rem;">
+                            <video id="camera-video" autoplay playsinline style="width: 100%; max-width: 400px; border-radius: var(--radius-md);"></video>
+                            <canvas id="camera-canvas" class="hidden"></canvas>
+                            <div class="mt-1">
+                                <button type="button" class="btn-primary" id="btn-capture-photo"><i class='bx bx-aperture'></i> Capturar</button>
+                                <button type="button" class="btn-danger" id="btn-stop-camera"><i class='bx bx-x'></i> Cancelar</button>
+                            </div>
+                        </div>
+
+                        <div id="photo-preview-container" class="hidden mt-1">
+                            <img id="photo-preview" src="" alt="Vista previa" style="max-width: 100%; border-radius: var(--radius-md);">
+                            <button type="button" class="btn-secondary btn-small mt-1" id="remove-photo">Quitar foto</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ubicación *</label>
+                        <div class="location-tools">
+                            <button type="button" class="btn-secondary btn-small" id="btn-geolocation">
+                                <i class='bx bx-current-location'></i> Usar mi ubicación actual
+                            </button>
+                            <span id="location-status" class="status-text"></span>
+                        </div>
+                        <p class="small-text">O selecciona el punto en el mapa:</p>
+                        <div id="report-map" class="map-container-small"></div>
+                        <input type="hidden" id="inc-lat" required>
+                        <input type="hidden" id="inc-lng" required>
+                        
+                        <label for="inc-address" class="mt-2">Dirección o referencia</label>
+                        <input type="text" id="inc-address" placeholder="Ej. Parque central, cerca del río..." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nivel de gravedad *</label>
+                        <div class="radio-group">
+                            <label class="radio-label"><input type="radio" name="severity" value="Bajo" required> Bajo</label>
+                            <label class="radio-label"><input type="radio" name="severity" value="Medio"> Medio</label>
+                            <label class="radio-label"><input type="radio" name="severity" value="Alto"> Alto</label>
+                            <label class="radio-label"><input type="radio" name="severity" value="Crítico"> Crítico</label>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+                    <h3 class="form-section-title">Datos de contacto (Opcional)</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="inc-name">Nombre</label>
+                            <input type="text" id="inc-name" placeholder="Tu nombre">
+                        </div>
+                        <div class="form-group">
+                            <label for="inc-email">Correo electrónico</label>
+                            <input type="email" id="inc-email" placeholder="correo@ejemplo.com">
+                        </div>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="inc-notify">
+                        <label for="inc-notify">Deseo recibir información sobre el estado de mi reporte.</label>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-large w-100">
+                        <i class='bx bx-send'></i> Enviar reporte
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ================= TRACK REPORT SECTION ================= -->
+        <section id="track" class="page-section hidden">
+            <!-- Video Background -->
+            <video autoplay loop muted playsinline style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; transform: scale(1.05); z-index: -100; pointer-events: none;">
+                <source src="{{ url_for('static', filename='geoecosof_video.mp4') }}" type="video/mp4">
+            </video>
+
+            <div class="container-narrow mt-nav">
+                <div class="form-header text-center">
+                    <h2>Consultar reporte</h2>
+                    <p style="display: none;">Ingresa el código de tu reporte para ver su estado actual.</p>
+                </div>
+
+                <div class="search-box card">
+                    <div class="search-input-group">
+                        <input type="text" id="search-code" placeholder="Ej. GEO-000124">
+                        <button class="btn-primary" id="btn-search-report"><i class='bx bx-search'></i> Buscar</button>
+                    </div>
+                    <p id="search-error" class="error-text hidden">No se encontró ningún reporte con este código.</p>
+                </div>
+
+                <div id="report-details" class="report-details card hidden">
+                    <div class="report-header">
+                        <h3 id="det-code">GEO-000124</h3>
+                        <span id="det-severity" class="badge">Gravedad Media</span>
+                    </div>
+
+                    <div class="timeline">
+                        <div class="timeline-step" id="step-recibido">
+                            <div class="step-icon"><i class='bx bx-envelope'></i></div>
+                            <span>Recibido</span>
+                        </div>
+                        <div class="timeline-line"></div>
+                        <div class="timeline-step" id="step-revision">
+                            <div class="step-icon"><i class='bx bx-search-alt-2'></i></div>
+                            <span>En revisión</span>
+                        </div>
+                        <div class="timeline-line"></div>
+                        <div class="timeline-step" id="step-seguimiento">
+                            <div class="step-icon"><i class='bx bx-run'></i></div>
+                            <span>En seguimiento</span>
+                        </div>
+                        <div class="timeline-line"></div>
+                        <div class="timeline-step" id="step-solucionado">
+                            <div class="step-icon"><i class='bx bx-check'></i></div>
+                            <span>Solucionado</span>
+                        </div>
+                    </div>
+
+                    <div class="report-info-grid">
+                        <div class="info-item">
+                            <span class="label">Tipo de incidente:</span>
+                            <span class="value" id="det-type">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Fecha:</span>
+                            <span class="value" id="det-date">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Ubicación:</span>
+                            <span class="value" id="det-address">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item full">
+                        <span class="label">Descripción:</span>
+                        <p class="value" id="det-desc">-</p>
+                    </div>
+
+                    <div class="info-item full" id="det-photo-container">
+                        <span class="label">Evidencia:</span>
+                        <img id="det-photo" src="" alt="Evidencia del reporte" class="report-photo">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= MAP VIEW SECTION ================= -->
+        <section id="map-view" class="page-section hidden">
+            <div class="container mt-nav">
+                <div class="map-header">
+                    <h2>Mapa Ambiental</h2>
+                    <p>Visualiza todos los incidentes reportados en la comunidad.</p>
+                </div>
+                
+                <div class="map-filters card">
+                    <div class="filter-group">
+                        <label>Tipo de problema:</label>
+                        <select id="filter-type">
+                            <option value="Todos">Todos</option>
+                            <option value="Deforestación">Deforestación</option>
+                            <option value="Botadero clandestino">Botaderos clandestinos</option>
+                            <option value="Acumulación de basura">Basuras</option>
+                            <option value="Contaminación del suelo">Contaminación del suelo</option>
+                            <option value="Contaminación del agua">Contaminación del agua</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Estado:</label>
+                        <select id="filter-status">
+                            <option value="Todos">Todos</option>
+                            <option value="Recibido">Recibido</option>
+                            <option value="En revisión">En revisión</option>
+                            <option value="En seguimiento">En seguimiento</option>
+                            <option value="Solucionado">Solucionado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="main-map" class="main-map-container"></div>
+            </div>
+        </section>
+
+        <!-- ================= ADMIN SECTION ================= -->
+        <section id="admin" class="page-section admin-dashboard-layout hidden">
+            <!-- Sidebar -->
+            <aside class="admin-sidebar">
+                <div class="sidebar-logo" style="display: flex; align-items: center; gap: 10px;">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Geoecosof Logo" style="height: 35px; width: auto; object-fit: contain;">
+                    <span style="color: #1a9e32; font-weight: 700; font-size: 1.4rem;">Geoecosof</span>
+                </div>
+                <nav class="sidebar-menu">
+                    <a href="#" class="sidebar-link active" data-admin-view="admin-view-dashboard"><i class='bx bx-grid-alt'></i> Dashboard</a>
+                    <a href="#" class="sidebar-link" data-admin-view="admin-view-reports"><i class='bx bx-list-ul'></i> Reportes</a>
+                    <a href="#" data-target="home" onclick="document.querySelector('.navbar').style.display='flex'; document.querySelector('[data-target=\'home\']').click(); return false;"><i class='bx bx-home'></i> Volver al Inicio</a>
+                </nav>
+                <div class="sidebar-footer">
+                    <a href="/logout"><i class='bx bx-log-out'></i> Cerrar Sesión</a>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="admin-main">
+                <header class="admin-topbar">
+                    <div>
+                        <h1 id="admin-topbar-title">Dashboard</h1>
+                        <p id="admin-topbar-desc">Resumen general de los reportes ambientales</p>
+                    </div>
+                    <div class="topbar-profile">
+                        <i class='bx bx-user-circle'></i> Administrador
+                    </div>
+                </header>
+                
+                <div class="admin-content-area">
+                    <!-- ================= DASHBOARD VIEW ================= -->
+                    <div id="admin-view-dashboard" class="admin-view">
+                        <!-- KPIs -->
+                        <div class="admin-kpi-grid">
+                            <div class="kpi-card">
+                                <div class="kpi-info">
+                                    <span class="kpi-title">TOTAL DE REPORTES</span>
+                                    <h2 id="admin-stat-total">0</h2>
+                                    <span class="kpi-desc">Reportes registrados</span>
+                                </div>
+                                <div class="kpi-icon"><i class='bx bx-file'></i></div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-info">
+                                    <span class="kpi-title">RECIBIDOS</span>
+                                    <h2 id="admin-stat-new">0</h2>
+                                    <span class="kpi-desc">Nuevos reportes</span>
+                                </div>
+                                <div class="kpi-icon received" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><i class='bx bx-envelope'></i></div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-info">
+                                    <span class="kpi-title">EN SEGUIMIENTO</span>
+                                    <h2 id="admin-stat-review">0</h2>
+                                    <span class="kpi-desc">Requieren atención</span>
+                                </div>
+                                <div class="kpi-icon warning"><i class='bx bx-run'></i></div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-info">
+                                    <span class="kpi-title">SOLUCIONADOS</span>
+                                    <h2 id="admin-stat-solved">0</h2>
+                                    <span class="kpi-desc">Casos cerrados</span>
+                                </div>
+                                <div class="kpi-icon success"><i class='bx bx-check-shield'></i></div>
+                            </div>
+                        </div>
+
+                        <!-- Charts -->
+                        <div class="admin-charts-grid">
+                            <div class="chart-container">
+                                <div class="chart-header">
+                                    <h3>Reportes por tipo</h3>
+                                    <p>Distribución de incidentes ambientales</p>
+                                </div>
+                                <div class="chart-body">
+                                    <canvas id="adminTypeChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <div class="chart-header">
+                                    <h3>Estado de reportes</h3>
+                                    <p>Progreso actual de los casos</p>
+                                </div>
+                                <div class="chart-body">
+                                    <canvas id="adminStatusChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ================= REPORTS VIEW ================= -->
+                    <div id="admin-view-reports" class="admin-view hidden">
+                        <!-- Table -->
+                        <div class="admin-table-container card" id="admin-table-container">
+                            <div class="chart-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom: 20px;">
+                                <div class="table-actions" style="margin:0; flex:1;">
+                                    <input type="text" id="admin-search" placeholder="Buscar por código o tipo..." style="width: 100%; max-width: 400px;">
+                                </div>
+                                <div class="table-actions" style="margin:0;">
+                                    <button class="btn-secondary btn-small" id="admin-reset-data"><i class='bx bx-reset'></i> Limpiar filtros</button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Código</th>
+                                            <th>Fecha</th>
+                                            <th>Tipo</th>
+                                            <th>Gravedad</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-table-body">
+                                        <!-- Data will be loaded here via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Admin Logic for View Switching -->
+            <script>
+                document.querySelectorAll('.sidebar-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        // Active state
+                        document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+                        this.classList.add('active');
+
+                        // Toggle views
+                        const target = this.getAttribute('data-admin-view');
+                        document.querySelectorAll('.admin-view').forEach(v => {
+                            if(v.id === target) v.classList.remove('hidden');
+                            else v.classList.add('hidden');
+                        });
+
+                        // Update header
+                        if(target === 'admin-view-dashboard') {
+                            document.getElementById('admin-topbar-title').innerText = 'Dashboard';
+                            document.getElementById('admin-topbar-desc').innerText = 'Resumen general de los reportes ambientales';
+                        } else {
+                            document.getElementById('admin-topbar-title').innerText = 'Reportes';
+                            document.getElementById('admin-topbar-desc').innerText = 'Gestiona y consulta los reportes ambientales registrados.';
+                        }
+                    });
+                });
+            </script>
+
+            <!-- Admin Modal for Editing Status -->
+            <div id="admin-modal" class="modal hidden">
+                <div class="modal-content card">
+                    <span class="close-modal" id="close-modal">&times;</span>
+                    <h3>Gestionar Reporte <span id="modal-code"></span></h3>
+                    
+                    <div id="modal-report-details" class="mt-2" style="font-size: 0.9rem; margin-bottom: 1rem; padding: 1rem; background: var(--color-light); border-radius: var(--radius-md);">
+                        <p><strong>Tipo:</strong> <span id="modal-type"></span></p>
+                        <p><strong>Descripción:</strong> <span id="modal-desc"></span></p>
+                        <p><strong>Ubicación:</strong> <span id="modal-address"></span></p>
+                        <p id="modal-coords-container" style="display: none;"><strong>Coordenadas:</strong> <a id="modal-coords" href="#" target="_blank" style="color: var(--color-accent); text-decoration: underline;"></a></p>
+                        <p><strong>Contacto:</strong> <span id="modal-contact"></span></p>
+                        <div id="modal-photo-container" class="mt-1 hidden">
+                            <img id="modal-photo" src="" alt="Evidencia" style="width:100%; border-radius: var(--radius-md);">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group mt-2">
+                        <label>Cambiar Estado:</label>
+                        <select id="modal-status">
+                            <option value="Recibido">Recibido</option>
+                            <option value="En revisión">En revisión</option>
+                            <option value="En seguimiento">En seguimiento</option>
+                            <option value="Solucionado">Solucionado</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn-primary w-100" id="btn-save-status">Guardar Cambios</button>
+                    <button class="btn-danger w-100 mt-1" id="btn-delete-report">Eliminar Reporte</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer id="main-footer" class="footer new-footer">
+        <div class="footer-centered-content">
+            <h2 class="gold-title">GEOECOSOF GUARDIANES DEL MAÑANA</h2>
+            <p class="subtitle">Una plataforma para promover la protección y conservación de nuestros ecosistemas.</p>
+            
+            <div class="footer-contacts-row">
+                <a href="https://www.facebook.com/share/18MgpaWA6e/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" class="gold-icon"><i class='bx bxl-facebook'></i></a>
+                <a href="https://www.instagram.com/alejandro_vergara56?stkn=MXV5ejV0dmowZ3FwaA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" class="gold-icon"><i class='bx bxl-instagram'></i></a>
+                <a href="mailto:geoecosof@gmail.com" class="gold-email"><i class='bx bx-envelope'></i> geoecosof@gmail.com</a>
+            </div>
+            
+            <div class="footer-bottom-text">
+                &copy; 2026 Geoecosof. Proyecto académico orientado al desarrollo sostenible.
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- App JS -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

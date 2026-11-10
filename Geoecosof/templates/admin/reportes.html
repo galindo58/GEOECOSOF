@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geoecosof - Admin Reportes</title>
+    
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    
+    <style>
+        :root {
+            --primary-green: #20b72c;
+            --dark-green: #147a1d;
+            --gradient-green: linear-gradient(135deg, #20b72c 0%, #158a20 100%);
+            --accent-orange: #f39c12;
+            --accent-green: #27ae60;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --bg-glass: rgba(255, 255, 255, 0.85);
+            --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.12);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-image: url('/static/img/fondo.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ================= HEADER Y BARRA DE NAVEGACIÓN ================= */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            width: 45px;
+            height: auto;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-green);
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 1.05rem;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: var(--transition);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-green);
+            transition: var(--transition);
+            border-radius: 2px;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-green);
+        }
+
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+        
+        .nav-link.active {
+            color: var(--primary-green);
+        }
+
+        .btn-logout {
+            background: var(--gradient-green);
+            color: white;
+            text-decoration: none;
+            padding: 0.7rem 1.8rem;
+            border-radius: 50px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(32, 183, 44, 0.3);
+            transition: var(--transition);
+            border: 1px solid rgba(255,255,255,0.2);
+            letter-spacing: 0.3px;
+        }
+
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(32, 183, 44, 0.4);
+            background: linear-gradient(135deg, #25cc31 0%, #189e24 100%);
+        }
+
+        /* ================= MAIN CONTENT ================= */
+        .dashboard-container {
+            flex: 1;
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            padding: 2rem 3rem;
+            border-radius: 24px;
+            margin-bottom: 2.5rem;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-header h1 {
+            color: var(--primary-green);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .page-header p {
+            color: var(--text-light);
+        }
+
+        .header-actions input {
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            border: 1px solid #ddd;
+            width: 300px;
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .header-actions input:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(32, 183, 44, 0.2);
+        }
+
+        .table-container {
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: rgba(32, 183, 44, 0.1);
+            color: var(--primary-green);
+            text-align: left;
+            padding: 1.2rem 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        th:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+        th:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+
+        td {
+            padding: 1.2rem 1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            vertical-align: middle;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        tbody tr {
+            transition: var(--transition);
+        }
+
+        tbody tr:hover {
+            background-color: rgba(255,255,255,0.5);
+        }
+
+        .status-badge {
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-received { background-color: #e2e8f0; color: #475569; }
+        .status-review { background-color: #fef3c7; color: #d97706; }
+        .status-tracking { background-color: #dbeafe; color: #2563eb; }
+        .status-solved { background-color: #d1fae5; color: #059669; }
+
+        .severity-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .sev-low { background-color: #e2e8f0; color: #475569; }
+        .sev-medium { background-color: #fef3c7; color: #d97706; }
+        .sev-high { background-color: #fee2e2; color: #dc2626; }
+        .sev-critical { background-color: #7f1d1d; color: #fecaca; }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--text-light);
+            transition: var(--transition);
+            margin-right: 10px;
+        }
+
+        .action-btn:hover {
+            color: var(--primary-green);
+        }
+
+        .action-btn.delete:hover {
+            color: #dc2626;
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1.5rem;
+                padding: 1.5rem;
+            }
+            .header-actions input {
+                width: 100%;
+            }
+            .table-container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= HEADER / NAVBAR ================= -->
+    <nav class="navbar">
+        <a href="/" class="logo-container">
+            <img src="/static/img/logo.png" alt="Geoecosof" class="logo-img">
+            <span class="logo-text">Geoecosof</span>
+        </a>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Inicio</a>
+            <a href="/admin/dashboard" class="nav-link">Dashboard</a>
+            <a href="/admin/reportes" class="nav-link active">Reportes</a>
+            <a href="/logout" class="btn-logout">
+                <i class='bx bx-door-open'></i> Salir
+            </a>
+        </div>
+    </nav>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="dashboard-container">
+        
+        <div class="page-header">
+            <div>
+                <h1>Gestión de Reportes</h1>
+                <p>Administra, actualiza y haz seguimiento de todos los incidentes</p>
+            </div>
+            <div class="header-actions">
+                <input type="text" id="admin-search-standalone" placeholder="Buscar por código o tipo...">
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Gravedad</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-table-body-standalone">
+                    <!-- Data loaded via JS -->
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+
+    <!-- Modal para editar estado -->
+    <div id="admin-status-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+        <div style="background:white; padding:2rem; border-radius:16px; width:400px; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
+            <h2 style="margin-bottom:1.5rem; color:var(--text-dark);">Actualizar Estado</h2>
+            <select id="admin-modal-status" style="width:100%; padding:0.8rem; margin-bottom:1.5rem; border-radius:8px; border:1px solid #ddd; font-family:inherit;">
+                <option value="Recibido">Recibido</option>
+                <option value="En revisión">En revisión</option>
+                <option value="En seguimiento">En seguimiento</option>
+                <option value="Solucionado">Solucionado</option>
+            </select>
+            <div style="display:flex; justify-content:flex-end; gap:1rem;">
+                <button onclick="document.getElementById('admin-status-modal').style.display='none'" style="padding:0.6rem 1.2rem; background:#f1f5f9; border:none; border-radius:8px; cursor:pointer; font-weight:600; color:var(--text-dark);">Cancelar</button>
+                <button id="admin-modal-save" style="padding:0.6rem 1.2rem; background:var(--primary-green); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:600;">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/static/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStandaloneAdminTable();
+
+            const searchInput = document.getElementById('admin-search-standalone');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const term = e.target.value.toLowerCase();
+                    const rows = document.querySelectorAll('#admin-table-body-standalone tr');
+                    rows.forEach(row => {
+                        const text = row.innerText.toLowerCase();
+                        row.style.display = text.includes(term) ? '' : 'none';
+                    });
+                });
+            }
+        });
+
+        async function loadStandaloneAdminTable() {
+            const tbody = document.getElementById('admin-table-body-standalone');
+            if (!tbody) return;
+            
+            try {
+                const response = await fetch('/api/reports');
+                const reports = await response.json();
+                
+                tbody.innerHTML = '';
+                
+                reports.forEach(r => {
+                    const tr = document.createElement('tr');
+                    
+                    let statusClass = 'status-received';
+                    if(r.status === 'En revisión') statusClass = 'status-review';
+                    if(r.status === 'En seguimiento') statusClass = 'status-tracking';
+                    if(r.status === 'Solucionado') statusClass = 'status-solved';
+                    
+                    let sevClass = 'sev-low';
+                    if(r.severity === 'Medio') sevClass = 'sev-medium';
+                    if(r.severity === 'Alto') sevClass = 'sev-high';
+                    if(r.severity === 'Crítico') sevClass = 'sev-critical';
+                    
+                    tr.innerHTML = `
+                        <td><strong>${r.id}</strong></td>
+                        <td>${r.date}</td>
+                        <td>${r.type}</td>
+                        <td><span class="severity-badge ${sevClass}">${r.severity}</span></td>
+                        <td><span class="status-badge ${statusClass}">${r.status}</span></td>
+                        <td>
+                            <button class="action-btn" onclick="openStandaloneStatusModal('${r.id}', '${r.status}')" title="Actualizar estado"><i class='bx bx-edit-alt'></i></button>
+                            <button class="action-btn delete" onclick="deleteStandaloneReport('${r.id}')" title="Eliminar"><i class='bx bx-trash'></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error("Error loading admin table:", err);
+            }
+        }
+
+        let currentReportId = null;
+
+        function openStandaloneStatusModal(id, currentStatus) {
+            currentReportId = id;
+            document.getElementById('admin-modal-status').value = currentStatus;
+            document.getElementById('admin-status-modal').style.display = 'flex';
+        }
+
+        document.getElementById('admin-modal-save').addEventListener('click', async () => {
+            if (!currentReportId) return;
+            
+            const newStatus = document.getElementById('admin-modal-status').value;
+            const btn = document.getElementById('admin-modal-save');
+            btn.innerText = 'Guardando...';
+            btn.disabled = true;
+            
+            try {
+                const res = await fetch(\`/api/reports/\${currentReportId}\`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                
+                if (res.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Estado actualizado',
+                        text: 'El reporte se ha actualizado correctamente.',
+                        confirmButtonColor: '#20b72c'
+                    });
+                    document.getElementById('admin-status-modal').style.display = 'none';
+                    loadStandaloneAdminTable();
+                } else {
+                    throw new Error("Failed to update");
+                }
+            } catch (err) {
+                console.error(err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo actualizar el estado.',
+                    confirmButtonColor: '#20b72c'
+                });
+            } finally {
+                btn.innerText = 'Guardar';
+                btn.disabled = false;
+            }
+        });
+
+        async function deleteStandaloneReport(id) {
+            const result = await Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Esta acción no se puede deshacer.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const res = await fetch(\`/api/reports/\${id}\`, { method: 'DELETE' });
+                    if (res.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Eliminado',
+                            text: 'El reporte ha sido eliminado.',
+                            confirmButtonColor: '#20b72c'
+                        });
+                        loadStandaloneAdminTable();
+                    }
+                } catch (err) {
+                    console.error(err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudo eliminar el reporte.',
+                        confirmButtonColor: '#20b72c'
+                    });
+                }
+            }
+        }
+    </script>
+</body>
+</html>
